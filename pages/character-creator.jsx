@@ -25,7 +25,7 @@ export default function Creator({ test }) {
 }
 
 export function getServerSideProps(){
-  const test = "Wepa"
+  const test = process.env.DB_NAME;
   return {
     props:{
       test 
