@@ -1,10 +1,20 @@
 import { Prisma, PrismaClient } from '@prisma/client'
+import axios from 'axios';
 import Link from 'next/link'
 
 export default function Creator({ races }) {
 
   const testo = () => {
     console.log(JSON.parse(results));
+  }
+
+  const selectRace = (e) => {
+    axios.get(`/api/getRaces/${e.target.value}`).then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
   }
 
   return (
@@ -21,10 +31,10 @@ export default function Creator({ races }) {
         <label>
           <p>Seleccionar Clase</p>
 
-          <select>
+          <select onChange={selectRace}>
             {
               JSON.parse(races).map( ({ id, name }) => (
-                <option key={id}>{name}</option>
+                <option key={id} value={id}>{name}</option>
               ))
             }
           </select>
