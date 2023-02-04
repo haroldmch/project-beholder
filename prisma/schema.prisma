@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model races {
+  race_id             Int              @id @default(autoincrement()) @db.UnsignedInt
+  race_name           String?          @db.VarChar(20)
+  race_description    String?          @db.MediumText
+  race_score_increase Boolean?
+  race_size           races_race_size
+  race_speed          races_race_speed @default(EMPTY_ENUM_VALUE)
+  race_created        DateTime         @default(now()) @db.Timestamp(0)
+  race_updates        DateTime         @default(now()) @db.Timestamp(0)
+  race_deleted        DateTime?        @default(now()) @db.Timestamp(0)
+}
+
+enum races_race_size {
+  S
+  M
+}
+
+enum races_race_speed {
+  speedM           @map("30")
+  speedS           @map("25")
+  EMPTY_ENUM_VALUE @map("")
+}

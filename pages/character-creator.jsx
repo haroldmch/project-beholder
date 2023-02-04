@@ -1,6 +1,12 @@
+import { Prisma, PrismaClient } from '@prisma/client'
 import Link from 'next/link'
 
-export default function Creator({ test }) {
+export default function Creator({ races }) {
+
+  const testo = () => {
+    console.log(JSON.parse(results));
+  }
+
   return (
     <>
       <h2>Creador de Personaje</h2>
@@ -8,14 +14,19 @@ export default function Creator({ test }) {
 
       <form>
         <label>
-          <p>Nombre del Personaje {test}</p>
+          <p onClick={testo}>Nombre del Personaje </p>
           <input type="text" />
         </label>
 
         <label>
           <p>Seleccionar Clase</p>
+
           <select>
-            <option value="">Test</option>
+            {
+              JSON.parse(races).map( ({ id, name }) => (
+                <option key={id}>{name}</option>
+              ))
+            }
           </select>
         </label>
 
@@ -24,11 +35,25 @@ export default function Creator({ test }) {
   )
 }
 
-export function getServerSideProps(){
-  const test = process.env.DB_NAME;
+export async function getStaticProps(){
+
+  const prisma = new PrismaClient();
+
+  const results = await prisma.$queryRaw(
+    Prisma.sql`
+      SELECT
+        race_id as id,
+        race_name as name,
+        date_format(race_created,'%m/%d/%Y %h:%i:%s %p') as date
+      FROM races
+    `);
+
   return {
     props:{
-      test 
+      races: JSON.stringify(
+        results,
+        (key, value) => (typeof value === 'bigint' ? value.toString() : value)
+      )
     }
   }
 }
