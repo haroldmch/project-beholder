@@ -6,10 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prismaDev": "dotenv -e .env.local -- npx prisma db pull"
   },
   "dependencies": {
     "@prisma/client": "^4.9.0",
+    "dotenv-cli": "^7.0.0",
     "eslint": "8.33.0",
     "eslint-config-next": "13.1.6",
     "next": "13.1.6",
