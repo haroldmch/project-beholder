@@ -7,16 +7,186 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model abilities {
+  ability_id              Boolean                   @id
+  ability_name            String?                   @db.VarChar(20)
+  ability_description     String?                   @db.Text
+  ability_tips            String?                   @db.TinyText
+  ability_created         DateTime                  @default(now()) @db.Timestamp(0)
+  ability_updated         DateTime                  @default(now()) @db.Timestamp(0)
+  ability_deleted         DateTime?                 @db.Timestamp(0)
+  class_saving_throws     class_saving_throws[]     @ignore
+  race_score_increases    race_score_increases[]
+  skills                  skills[]
+  subrace_score_increases subrace_score_increases[]
+}
+
+model clasess {
+  class_id            Int                   @id @default(autoincrement()) @db.UnsignedTinyInt
+  class_name          String?               @db.VarChar(20)
+  class_description   String?               @db.TinyText
+  class_hit_dice      String?               @db.VarChar(5)
+  class_armors        String?               @db.TinyText
+  class_weapons       String?               @db.TinyText
+  class_tools         String?               @db.TinyText
+  class_tips          String?               @db.TinyText
+  class_max_skills    Boolean?
+  class_created       DateTime              @default(now()) @db.Timestamp(0)
+  class_updated       DateTime              @default(now()) @db.Timestamp(0)
+  class_deleted       DateTime?             @db.Timestamp(0)
+  class_saving_throws class_saving_throws[] @ignore
+  class_skills        class_skills[]        @ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model class_saving_throws {
+  class_id   Int       @db.UnsignedTinyInt
+  ability_id Boolean
+  abilities  abilities @relation(fields: [ability_id], references: [ability_id], onUpdate: Restrict, map: "class_saving_throws_ibfk_1")
+  clasess    clasess   @relation(fields: [class_id], references: [class_id], onUpdate: Restrict, map: "class_saving_throws_ibfk_2")
+
+  @@index([ability_id], map: "ability_id")
+  @@index([class_id], map: "class_id")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model class_skills {
+  class_id Int     @db.UnsignedTinyInt
+  skill_id Int     @db.UnsignedTinyInt
+  clasess  clasess @relation(fields: [class_id], references: [class_id], onUpdate: Restrict, map: "class_skills_ibfk_1")
+  skills   skills  @relation(fields: [skill_id], references: [skill_id], onUpdate: Restrict, map: "class_skills_ibfk_2")
+
+  @@index([class_id], map: "class_id")
+  @@index([skill_id], map: "skill_id")
+  @@ignore
+}
+
+model draconic_ancestries {
+  draconic_ancestry_id            Int       @id @default(autoincrement()) @db.UnsignedTinyInt
+  draconic_ancestry_dragon        String?   @db.VarChar(20)
+  draconic_ancestry_damage_type   String?   @db.VarChar(20)
+  draconic_ancestry_breath_weapon String?   @db.VarChar(40)
+  draconic_ancestry_created       DateTime  @default(now()) @db.Timestamp(0)
+  draconic_ancestry_updated       DateTime  @default(now()) @db.Timestamp(0)
+  draconic_ancestry_deleted       DateTime? @db.Timestamp(0)
+}
+
+model race_score_increases {
+  race_score_increase_id     Int                                           @id @default(autoincrement()) @db.UnsignedTinyInt
+  race_score_increase_number Boolean?
+  race_score_increase_type   race_score_increases_race_score_increase_type @default(EMPTY_ENUM_VALUE)
+  race_id                    Int                                           @db.UnsignedTinyInt
+  ability_id                 Boolean?
+  abilities                  abilities?                                    @relation(fields: [ability_id], references: [ability_id], onDelete: Restrict, onUpdate: Restrict, map: "race_score_increases_ibfk_1")
+  races                      races                                         @relation(fields: [race_id], references: [race_id], onUpdate: Restrict, map: "race_score_increases_ibfk_2")
+
+  @@index([ability_id], map: "ability_id")
+  @@index([race_id], map: "race_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model race_traits {
+  race_id  Int    @db.UnsignedTinyInt
+  trait_id Int    @db.UnsignedTinyInt
+  races    races  @relation(fields: [race_id], references: [race_id], onUpdate: Restrict, map: "race_traits_ibfk_1")
+  traits   traits @relation(fields: [trait_id], references: [trait_id], onUpdate: Restrict, map: "race_traits_ibfk_2")
+
+  @@index([race_id, trait_id], map: "race_id")
+  @@index([trait_id, race_id], map: "trait_id")
+  @@ignore
+}
+
 model races {
-  race_id             Int              @id @default(autoincrement()) @db.UnsignedInt
-  race_name           String?          @db.VarChar(20)
-  race_description    String?          @db.MediumText
-  race_score_increase Boolean?
-  race_size           races_race_size
-  race_speed          races_race_speed @default(EMPTY_ENUM_VALUE)
-  race_created        DateTime         @default(now()) @db.Timestamp(0)
-  race_updates        DateTime         @default(now()) @db.Timestamp(0)
-  race_deleted        DateTime?        @default(now()) @db.Timestamp(0)
+  race_id              Int                    @id @default(autoincrement()) @db.UnsignedTinyInt
+  race_name            String?                @db.VarChar(20)
+  race_description     String?                @db.MediumText
+  race_size            races_race_size
+  race_speed           races_race_speed       @default(EMPTY_ENUM_VALUE)
+  race_created         DateTime               @default(now()) @db.Timestamp(0)
+  race_updates         DateTime               @default(now()) @db.Timestamp(0)
+  race_deleted         DateTime?              @default(now()) @db.Timestamp(0)
+  race_score_increases race_score_increases[]
+  race_traits          race_traits[]          @ignore
+  subraces             subraces[]
+}
+
+model skills {
+  skill_id          Int            @id @default(autoincrement()) @db.UnsignedTinyInt
+  skill_name        String?        @db.VarChar(20)
+  skill_description String?        @db.Text
+  skill_created     DateTime       @default(now()) @db.Timestamp(0)
+  skill_updated     DateTime       @default(now()) @db.Timestamp(0)
+  skill_deleted     DateTime?      @db.Timestamp(0)
+  ability_id        Boolean?
+  class_skills      class_skills[] @ignore
+  abilities         abilities?     @relation(fields: [ability_id], references: [ability_id], onDelete: Restrict, onUpdate: Restrict, map: "skills_ibfk_1")
+
+  @@index([ability_id], map: "ability_id")
+}
+
+model subrace_score_increases {
+  subrace_score_increase_id     Int                                                 @id @default(autoincrement()) @db.UnsignedTinyInt
+  subrace_score_increase_number Boolean?
+  subrace_score_increase_type   subrace_score_increases_subrace_score_increase_type @default(EMPTY_ENUM_VALUE)
+  subrace_id                    Int                                                 @db.UnsignedTinyInt
+  ability_id                    Boolean?
+  subraces                      subraces                                            @relation(fields: [subrace_id], references: [subrace_id], onUpdate: Restrict, map: "subrace_score_increases_ibfk_1")
+  abilities                     abilities?                                          @relation(fields: [ability_id], references: [ability_id], onDelete: Restrict, onUpdate: Restrict, map: "subrace_score_increases_ibfk_2")
+
+  @@index([ability_id], map: "ability_id")
+  @@index([subrace_id], map: "subrace_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model subrace_traits {
+  subrace_id Int      @db.UnsignedTinyInt
+  trait_id   Int      @db.UnsignedTinyInt
+  subraces   subraces @relation(fields: [subrace_id], references: [subrace_id], onUpdate: Restrict, map: "subrace_traits_ibfk_1")
+  traits     traits   @relation(fields: [trait_id], references: [trait_id], onUpdate: Restrict, map: "subrace_traits_ibfk_2")
+
+  @@index([subrace_id, trait_id], map: "subrace_id")
+  @@index([trait_id, subrace_id], map: "trait_id")
+  @@ignore
+}
+
+model subraces {
+  subrace_id              Int                       @id @default(autoincrement()) @db.UnsignedTinyInt
+  subrace_name            String?                   @db.VarChar(30)
+  subrace_description     String?                   @db.Text
+  subrace_created         DateTime                  @default(now()) @db.Timestamp(0)
+  subrace_updated         DateTime                  @default(now()) @db.Timestamp(0)
+  subrace_deleted         DateTime?                 @db.Timestamp(0)
+  race_id                 Int                       @db.UnsignedTinyInt
+  subrace_score_increases subrace_score_increases[]
+  subrace_traits          subrace_traits[]          @ignore
+  races                   races                     @relation(fields: [race_id], references: [race_id], onUpdate: Restrict, map: "subraces_ibfk_1")
+
+  @@index([race_id], map: "race_id")
+}
+
+model traits {
+  trait_id          Int              @id @default(autoincrement()) @db.UnsignedTinyInt
+  trait_name        String?          @db.VarChar(50)
+  trait_description String?          @db.Text
+  trait_extra       Boolean?
+  trait_created     DateTime         @default(now()) @db.Timestamp(0)
+  trait_updated     DateTime         @default(now()) @db.Timestamp(0)
+  trait_deleted     DateTime?        @db.Timestamp(0)
+  race_traits       race_traits[]    @ignore
+  subrace_traits    subrace_traits[] @ignore
+}
+
+enum race_score_increases_race_score_increase_type {
+  EMPTY_ENUM_VALUE @map("")
+  halfelf          @map("1")
+  human            @map("0")
+}
+
+enum subrace_score_increases_subrace_score_increase_type {
+  EMPTY_ENUM_VALUE @map("")
+  halfelf          @map("1")
+  human            @map("0")
 }
 
 enum races_race_size {

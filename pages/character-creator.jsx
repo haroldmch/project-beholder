@@ -1,22 +1,12 @@
-import { Prisma, PrismaClient } from '@prisma/client'
-import axios from 'axios';
+
 import Link from 'next/link'
+import { getRaces } from '../db/getRaces'
+import { useCreateCharacter } from '../hooks/useCreateCharacter';
+
 
 export default function Creator({ races }) {
-
-  const testo = () => {
-    console.log(JSON.parse(results));
-  }
-
-  const selectRace = (e) => {
-    axios.get(`/api/getRaces/${e.target.value}`).then(function (response) {
-      console.log(response.data);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-  }
-
+  const { subraces, getSubraces, classes, skills } = useCreateCharacter(); 
+  
   return (
     <>
       <h2>Creador de Personaje</h2>
@@ -24,46 +14,44 @@ export default function Creator({ races }) {
 
       <form>
         <label>
-          <p onClick={testo}>Nombre del Personaje </p>
-          <input type="text" />
+          <p>Nombre del Personaje</p>
+          <input type="text" name="name" />
         </label>
 
         <label>
-          <p>Seleccionar Clase</p>
-
-          <select onChange={selectRace}>
+          <p>Raza</p>
+          <select onChange={({target}) => {getSubraces(target.value)}} defaultValue="" name="race">
+            <option value="" disabled>Selecciona Raza</option>
             {
-              JSON.parse(races).map( ({ id, name }) => (
-                <option key={id} value={id}>{name}</option>
+              races.map( ({ id, name }) => (
+                <option key={name} value={id}>{name}</option>
               ))
             }
           </select>
         </label>
+
+
+        {
+          subraces.map( (item) => (
+            <>
+              <p>{item.name}</p>
+            </>
+          ))
+        }    
+
 
       </form>
     </>
   )
 }
 
-export async function getStaticProps(){
+export async function getServerSideProps(){
 
-  const prisma = new PrismaClient();
-
-  const results = await prisma.$queryRaw(
-    Prisma.sql`
-      SELECT
-        race_id as id,
-        race_name as name,
-        date_format(race_created,'%m/%d/%Y %h:%i:%s %p') as date
-      FROM races
-    `);
+  const races = await getRaces();
 
   return {
     props:{
-      races: JSON.stringify(
-        results,
-        (key, value) => (typeof value === 'bigint' ? value.toString() : value)
-      )
+      races
     }
   }
 }
