@@ -16,4 +16,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Deploy on Vercel
 
-[https://project-beholder-21haqd9ic-haroldmch.vercel.app/](https://project-beholder-21haqd9ic-haroldmch.vercel.app/)
+[https://project-beholder.vercel.app/](https://project-beholder.vercel.app/)
