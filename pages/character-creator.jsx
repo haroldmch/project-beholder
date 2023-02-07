@@ -4,9 +4,17 @@ import { getRaces } from '../db/getRaces'
 import { useCreateCharacter } from '../hooks/useCreateCharacter';
 
 
-export default function Creator({ races }) {
-  const { subraces, getSubraces, classes, skills } = useCreateCharacter(); 
-  
+export default function Creator({ races, loading }) {
+  const {
+    subraces,
+    getSubraces,
+    isLoadingSubraces,
+    classes,
+    getClasess,
+    isLoadingClasses,
+    skills
+  } = useCreateCharacter(); 
+
   return (
     <>
       <h2>Creador de Personaje</h2>
@@ -17,6 +25,7 @@ export default function Creator({ races }) {
           <p>Nombre del Personaje</p>
           <input type="text" name="name" />
         </label>
+
 
         <label>
           <p>Raza</p>
@@ -30,22 +39,44 @@ export default function Creator({ races }) {
           </select>
         </label>
 
+        {
+          (!isLoadingSubraces) &&  (
+            <label>
+              <p>Subraza</p>
+              <select onChange={() => {getClasess()}} defaultValue="" name="subrace">
+                <option value="" disabled>Selecciona Subraza</option>
+                {
+                  subraces.map( ( {id, name} ) => (
+                    <option key={name} value={id}>{name}</option>
+                  ))
+                }
+              </select>
+            </label>
+          )
+        }
 
         {
-          subraces.map( (item) => (
-            <>
-              <p>{item.name}</p>
-            </>
-          ))
-        }    
-
+          (!isLoadingClasses) &&  (
+            <label>
+              <p>Clases</p>
+              <select defaultValue="" name="classes">
+                <option value="" disabled>Selecciona Clase</option>
+                {
+                  classes.map( ( {id, name} ) => (
+                    <option key={name} value={id}>{name}</option>
+                  ))
+                }
+              </select>
+            </label>
+          )
+        }
 
       </form>
     </>
   )
 }
 
-export async function getServerSideProps(){
+export async function getStaticProps(){
 
   const races = await getRaces();
 
