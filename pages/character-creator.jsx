@@ -1,5 +1,7 @@
 
 import Link from 'next/link'
+import Abitilies from '../components/Abitilies';
+import SelectOptions from '../components/SelectOptions';
 import { getRaces } from '../db/getRaces'
 import { useCreateCharacter } from '../hooks/useCreateCharacter';
 
@@ -12,7 +14,8 @@ export default function Creator({ races, loading }) {
     classes,
     getClasess,
     isLoadingClasses,
-    skills
+    showAbilities,
+    activateAbilities
   } = useCreateCharacter(); 
 
   return (
@@ -26,48 +29,38 @@ export default function Creator({ races, loading }) {
           <input type="text" name="name" />
         </label>
 
-
-        <label>
-          <p>Raza</p>
-          <select onChange={({target}) => {getSubraces(target.value)}} defaultValue="" name="race">
-            <option value="" disabled>Selecciona Raza</option>
-            {
-              races.map( ({ id, name }) => (
-                <option key={name} value={id}>{name}</option>
-              ))
-            }
-          </select>
-        </label>
+        <SelectOptions
+          items={races}
+          callback={getSubraces}
+          title="Raza"
+          placeholder="Selecciona Raza"
+          name="race" /> 
 
         {
           (!isLoadingSubraces) &&  (
-            <label>
-              <p>Subraza</p>
-              <select onChange={() => {getClasess()}} defaultValue="" name="subrace">
-                <option value="" disabled>Selecciona Subraza</option>
-                {
-                  subraces.map( ( {id, name} ) => (
-                    <option key={name} value={id}>{name}</option>
-                  ))
-                }
-              </select>
-            </label>
+            <SelectOptions
+              items={subraces}
+              callback={getClasess}
+              title="Subraza"
+              placeholder="Selecciona Subraza"
+              name="subrace" /> 
           )
         }
 
         {
           (!isLoadingClasses) &&  (
-            <label>
-              <p>Clases</p>
-              <select defaultValue="" name="classes">
-                <option value="" disabled>Selecciona Clase</option>
-                {
-                  classes.map( ( {id, name} ) => (
-                    <option key={name} value={id}>{name}</option>
-                  ))
-                }
-              </select>
-            </label>
+            <SelectOptions
+              	items={classes}
+                callback={activateAbilities}
+                title="Clases"
+                placeholder="Selecciona Clase"
+                name="classes" /> 
+          )
+        }
+
+        {
+          (showAbilities) &&  (
+            <Abitilies/>
           )
         }
 

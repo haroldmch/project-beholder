@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import axios from 'axios';
 
 export const useCreateCharacter = () => {
@@ -6,6 +6,7 @@ export const useCreateCharacter = () => {
         [isLoadingSubraces, setIsLoadingSubraces] = useState(true),
         [classes, setClasess] = useState([]),
         [isLoadingClasses, setIsLoadingClasses] = useState(true),
+        [showAbilities, setShowAbilities] = useState(false),
         [skills, setSkills] = useState([]),
         [isLoadingSkills, setIsLoadingSkills] = useState(true);
   
@@ -31,6 +32,14 @@ export const useCreateCharacter = () => {
       setIsLoadingClasses(false);
     });
   }
+
+  const activateAbilities = () => {
+    setShowAbilities(true);
+  }
+
+  // useEffect(() => {
+  //   setIsLoadingClasses(true);
+  // }, [ subraces ])
   
   return{
     subraces,
@@ -40,6 +49,9 @@ export const useCreateCharacter = () => {
     classes,
     getClasess,
     isLoadingClasses,
+
+    showAbilities,
+    activateAbilities,
 
     skills,
   }
