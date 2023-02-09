@@ -26,7 +26,7 @@ export default function AbilityItem({ title, name, points, callback }) {
         <p>{ title }</p>
         <div>
           <button type="button" onClick={() => {changeAbility(false)}}> &lt; </button>
-          <input type="number" name={ name } defaultValue={ score } disabled={true}/>
+          <input type="number" name={ name } value={ score }  disabled={true}/>
           <button type="button" onClick={() => {changeAbility(true)}}> &gt; </button>
           <span>{ modifier }</span>
         </div>
