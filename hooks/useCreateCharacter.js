@@ -14,6 +14,7 @@ export const useCreateCharacter = () => {
   const getSubraces = (raceId) => {
     setIsLoadingSubraces(true);
     setIsLoadingClasses(true);
+    setShowAbilities(false);
     axios.get(`/api/getSubraces/${raceId}`).then((res) => { 
       if(res.data.length > 0){
         setSubraces(res.data);
@@ -37,10 +38,6 @@ export const useCreateCharacter = () => {
     setShowAbilities(true);
   }
 
-  // useEffect(() => {
-  //   setIsLoadingClasses(true);
-  // }, [ subraces ])
-  
   return{
     subraces,
     getSubraces,
